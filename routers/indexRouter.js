@@ -2,8 +2,9 @@ import express from 'express'
 
 import productRouter from './productRoutes.js';
 
-const mainRouter = express.Router();
+const indexRouter = express.Router();
 
-mainRouter.use('/products', productRouter)
 
-export default mainRouter;
+indexRouter.use('/products', productRouter)
+
+export default indexRouter;

@@ -1,7 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from "dotenv"
-import mainRouter from './routers/indexRouter.js';
+import indexRouter from './routers/indexRouter.js';
 // const express = require('express');
 import bodyParser from 'body-parser';
 
