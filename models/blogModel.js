@@ -22,3 +22,6 @@ const blogSchema = new Schema({
     }
 
 })
+
+const Blog = model('Blog', blogSchema);
+export default Blog;
