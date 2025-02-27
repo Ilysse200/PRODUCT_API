@@ -18,3 +18,13 @@ export const CreateBlog = async (req, res) => {
         res.status(500).json({success:false, message:"Server error"})
     }
 }
+export const getAllBlogs=async(req, res)=>{
+    try{
+        const B = await Product.find();
+        res.status(200).json({success:true, Products});
+    }
+    catch(error){
+        res.status(500).json({success:false,message:"Server error", error:error.message });
+
+    }
+}
