@@ -15,4 +15,22 @@ export const auth = async(req, res, next) => {
     if(!token){
         return res.status(401).json({message:"The token is missing"});
     }
+    try{
+       const decoded = jwt.verify(token.process.env.JWT_SECRET);
+       const user = await User.findOne({
+        _id: decoded._id,
+       "tokens.accessToken": token,//Ensure this matches your user schema
+       });
+
+       if(! user){
+        return res.status(401).json({message:"User is not found or Token is invalid"});
+       }
+       req.token = token;
+       req.user = user;
+       next();
+       
+    } catch(error){
+        console.error("JWT Verification Error:", error); //Log the error for debugging
+        res.status(401).json({message:"Auithentication failed", error:error.message});
+    }
 }
