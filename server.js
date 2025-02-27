@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import dotenv from "dotenv"
 import mainRouter from './routers/contactRouter.js';
 import indexRouter from './routers/indexRouter.js';
+import startingRouter from './routers/blogRouter.js';
 // const express = require('express');
 import bodyParser from 'body-parser';
 
@@ -11,6 +12,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use('/',mainRouter);
 app.use('/', indexRouter)
+app.use('/', startingRouter);
 
 //variables that hold vvalues inside the .env file
 const db_user = process.env.DB_USER;

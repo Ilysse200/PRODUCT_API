@@ -1,7 +1,5 @@
 import mongoose from "mongoose";
-
-
-const {model, Schema} =  new Schema;
+const {model, Schema} =  mongoose;
 
 const userSchema = new Schema({
     userName:{
@@ -18,11 +16,14 @@ const userSchema = new Schema({
     },
     userRole:{
         type:String,
-        default: user,
+        default: "user",
         enum:["user", "admin"],
         required:true
         
 
+    },
+    tokens: { 
+        accessToken: { type: String }
     }
 })
 

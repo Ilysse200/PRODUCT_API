@@ -1,4 +1,4 @@
-import User from "../models/userModel";
+import User from "../models/userModel.js";
 import bcrypt from "bcryptjs";
 import {generateAccessToken} from "../utils/tokenGenerate.js"
 export const Register = async(req,res)=>{
@@ -30,3 +30,37 @@ export const Register = async(req,res)=>{
         res.status(500).json({error: error.message});
     }
     }
+export const Login = async (req, res) => {
+        try {
+          const { userEmail, userPassword } = req.body;
+          const user = await User.findOne({ userEmail });
+      
+          if (!user) {
+            // User not found
+            return res.status(404).json({ message: "User not found" });
+          }
+      
+          const isMatch = await bcrypt.compare(userPassword, user.userPassword);
+          if (!isMatch) {
+            return res.status(401).json({ message: "Invalid credentials" });
+          }
+          const accessToken = generateAccessToken(user);
+      
+      
+          user.tokens = { accessToken};
+      
+          await user.save();
+      
+          const userResponse = {
+            _id: user._id,
+            userEmail:user.userEmail,
+            tokens: { accessToken},
+          };
+        
+          res.json({ user: userResponse });
+        } catch (error) {
+          // General error handling
+          res.status(500).json({ message: "Server error", error: error.message });
+        }
+};
+
