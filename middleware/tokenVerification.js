@@ -1,36 +1,43 @@
-import jwt from "jsonwebtoken"
-import User from "../models/userModel.js"
-import dotenv from "dotenv"
+import jwt from "jsonwebtoken";
+import User from "../models/userModel.js";
+import dotenv from "dotenv";
+
 dotenv.config();
 
-export const auth = async(req, res, next) => {
+export const auth = async (req, res, next) => {
+  try {
     const authHeader = req.headers.authorization;
 
-    if(!authHeader){
-        return res.status(401).json({error: "Authorization header missing"});
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({ message: "Access denied, token missing" });
     }
 
-    const token = authHeader.split(" ")[1];//Extract the token from the header
+    const token = authHeader.split(" ")[1]; // Extract the actual token
 
-    if(!token){
-        return res.status(401).json({message:"The token is missing"});
+    if (!token) {
+      return res.status(401).json({ message: "Access denied, invalid token format" });
     }
-    try{
-       const decoded = jwt.verify(token.process.env.JWT_SECRET);
-       const user = await User.findOne({
-        _id: decoded._id,
-       "tokens.accessToken": token,//Ensure this matches your user schema
-       });
 
-       if(! user){
-        return res.status(401).json({message:"User is not found or Token is invalid"});
-       }
-       req.token = token;
-       req.user = user;
-       next();
-       
-    } catch(error){
-        console.error("JWT Verification Error:", error); //Log the error for debugging
-        res.status(401).json({message:"Auithentication failed", error:error.message});
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Find user by ID
+    const user = await User.findById(decoded._id);
+    
+    if (!user) {
+      return res.status(401).json({ message: "User not found or token expired" });
     }
-}
+
+    // Ensure token is the latest issued
+    if (user.tokens.accessToken !== token) {
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
+
+    req.user = user; // Attach user to request
+    req.token = token;
+     req.user.userRole = decoded.userRole;
+    next(); // Proceed to next middleware
+  } catch (error) {
+    console.error("JWT Verification Error:", error);
+    return res.status(401).json({ message: "Authentication failed", error: error.message });
+  }
+};

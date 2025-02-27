@@ -21,11 +21,15 @@ export const Register = async(req,res)=>{
     await user.save();
     res.status(201).json({ success: true, message: "User registered successfully", 
         user:{
-            ...user.toObject(),
+          _id:user._id, 
+          userName: user.userName,
+          userEmail: user.userEmail,
+          userRole: user.userRole,
             tokens:{
                 accessToken:user.tokens.accessToken,
             }
-        } });
+         }
+        });
     }catch(error){
         res.status(500).json({error: error.message});
     }
@@ -47,17 +51,23 @@ export const Login = async (req, res) => {
           const accessToken = generateAccessToken(user);
       
       
-          user.tokens = { accessToken};
+          user.tokens.accessToken = accessToken;
       
           await user.save();
-      
-          const userResponse = {
-            _id: user._id,
-            userEmail:user.userEmail,
-            tokens: { accessToken},
-          };
+          res.json({
+            message: "Login successful!",
+            user: {
+              _id: user._id,
+              userName: user.userName,
+              userEmail: user.userEmail,
+              userRole: user.userRole,
+              token: {
+                accessToken: user.tokens.accessToken,
+              },
+            },
+          });
+       
         
-          res.json({ user: userResponse });
         } catch (error) {
           // General error handling
           res.status(500).json({ message: "Server error", error: error.message });
